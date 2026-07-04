@@ -1,6 +1,7 @@
-let text = localStorage.getItem("city") || "delhi";
+let text = localStorage.getItem("city") || "Delhi";
+let yourApiKey="54945e9dedf4e63c6a9022d6a2df4651"
 
-let url = `https://api.openweathermap.org/data/2.5/weather?q=${text}&appid=54945e9dedf4e63c6a9022d6a2df4651&units=metric`
+let url = `https://api.openweathermap.org/data/2.5/weather?q=${text}&appid=${yourApiKey}&units=metric`
 
 fetch(url).then(response => response.json())
   .then(data =>
@@ -27,7 +28,7 @@ search.addEventListener("click", () => {
   let text = document.querySelector(".inp").value;
 
 
-  let url = `https://api.openweathermap.org/data/2.5/weather?q=${text}&appid=54945e9dedf4e63c6a9022d6a2df4651&units=metric`
+  let url = `https://api.openweathermap.org/data/2.5/weather?q=${text}&appid=${yourApiKey}&units=metric`
 
   fetch(url).then(response => response.json())
     .then(data => {
