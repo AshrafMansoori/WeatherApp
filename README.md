@@ -1,3 +1,5 @@
+##Live Demo
+https://weather-app-xi-ten-20.vercel.app/
 # 🌤️ Weather App
 
 A simple and responsive Weather App built using **HTML**, **CSS**, and **JavaScript**. It fetches real-time weather data from the **OpenWeather API** and displays current weather information for any city.
