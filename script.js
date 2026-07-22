@@ -1,60 +1,118 @@
-let text = localStorage.getItem("city") || "Delhi";
-let yourApiKey="54945e9dedf4e63c6a9022d6a2df4651"
+const API_KEY = "54945e9dedf4e63c6a9022d6a2df4651";
 
-let url = `https://api.openweathermap.org/data/2.5/weather?q=${text}&appid=${yourApiKey}&units=metric`
+// Load last searched city or Delhi
+const city = localStorage.getItem("city") || "Delhi";
 
-fetch(url).then(response => response.json())
-  .then(data =>
-    update(data)
-  ).catch(e => {
-    console.log("not found")
-  });
-
-
-let today = new Date();
-
-let options = {
+// Display current date
+const today = new Date();
+const options = {
   weekday: "long",
   day: "numeric",
   month: "long",
-  year: "numeric"
+  year: "numeric",
 };
 
-let date = today.toLocaleDateString("en-GB", options);
-document.querySelector(".span1").textContent = date;
+document.querySelector(".span1").textContent =
+  today.toLocaleDateString("en-GB", options);
 
-let search = document.querySelector(".icon1");
-search.addEventListener("click", () => {
-  let text = document.querySelector(".inp").value;
+// Fetch weather
+async function getWeather(cityName) {
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}&units=metric`;
 
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
 
-  let url = `https://api.openweathermap.org/data/2.5/weather?q=${text}&appid=${yourApiKey}&units=metric`
-
-  fetch(url).then(response => response.json())
-    .then(data => {
-      if (data.cod === 200) {
-        localStorage.setItem("city", text);
-        update(data);
-      }
-      else {
-        alert("City Not Found");
-      }
+    if (response.ok && data.cod == 200) {
+      localStorage.setItem("city", cityName);
+      update(data);
+    } else {
+      alert("City Not Found!");
     }
+  } catch (error) {
+    console.error(error);
+    alert("Unable to fetch weather data.");
+  }
+}
 
+// Load default city
+getWeather(city);
 
-    ).catch(e => {
-      console.log("not found")
-    });
+// Search button
+document.querySelector(".icon1").addEventListener("click", () => {
+  const cityName = document.querySelector(".inp").value.trim();
 
-})
+  if (cityName === "") {
+    alert("Please enter a city name.");
+    return;
+  }
+
+  getWeather(cityName);
+});
+
+// Search using Enter key
+document.querySelector(".inp").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    document.querySelector(".icon1").click();
+  }
+});
+
+// Update UI
 function update(data) {
-  console.log(data.cod);
   document.querySelector(".inp").value = "";
+
   document.querySelector(".delhi").textContent = data.name;
-  document.querySelector(".temp2").textContent = data.main.temp;
-  document.querySelector(".t").textContent = data.main.feels_like;
-  document.querySelector(".h").textContent = `${data.main.humidity}%`;
-  document.querySelector(".w").textContent = `${data.wind.speed}km/h`;
-  document.querySelector(".p").textContent = `${data.main.pressure}pa`;
+  document.querySelector(".temp2").textContent = `${Math.round(
+    data.main.temp
+  )}°C`;
   document.querySelector(".temp1").textContent = data.weather[0].main;
+  document.querySelector(".t").textContent = `${Math.round(
+    data.main.feels_like
+  )}°C`;
+  document.querySelector(".h").textContent = `${data.main.humidity}%`;
+  document.querySelector(".w").textContent = `${data.wind.speed} km/h`;
+  document.querySelector(".p").textContent = `${data.main.pressure} hPa`;
+
+  // Weather Emoji
+  const weather = data.weather[0].main.toLowerCase();
+  const icon = document.querySelector(".weather-icon");
+
+  switch (weather) {
+    case "clear":
+      icon.textContent = "☀️";
+      break;
+
+    case "clouds":
+      icon.textContent = "☁️";
+      break;
+
+    case "rain":
+      icon.textContent = "🌧️";
+      break;
+
+    case "drizzle":
+      icon.textContent = "🌦️";
+      break;
+
+    case "thunderstorm":
+      icon.textContent = "⛈️";
+      break;
+
+    case "snow":
+      icon.textContent = "❄️";
+      break;
+
+    case "mist":
+    case "fog":
+    case "haze":
+      icon.textContent = "🌫️";
+      break;
+
+    case "smoke":
+      icon.textContent = "💨";
+      break;
+
+    default:
+      icon.textContent = "🌤️";
+  }
 }
